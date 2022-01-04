@@ -4,7 +4,7 @@ import { Entity, Player } from './src/entity';
 import cors from 'cors';
 
 const HOST = '0.0.0.0';
-const PORT = 8080;
+const PORT = parseInt(process.env.PORT || '8080', 10);
 
 const entities: Entity[] = [];
 
