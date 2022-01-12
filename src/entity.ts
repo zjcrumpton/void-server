@@ -19,7 +19,7 @@ export class Player implements Entity {
   public state: EntityState;
 
   constructor({ 
-    speed = 1.5,
+    speed = 100,
     position: {
       x = 0,
       y = 0

@@ -7,15 +7,19 @@ const HOST = '0.0.0.0';
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
 const entities: Entity[] = [];
+const clients: any[] = [];
 
-const app = express(); 
+const app = express();
+
+app.use(cors({
+  origin: '*'
+}));
+
 const server = app.listen(PORT, HOST, () => {
   console.log(`THE VOID is running @ ${HOST}:${PORT} `);
 });
 
-app.use(cors({
-  origin: '*'
-}))
+
 
 const io = new Server(server, {
   cors: {
@@ -36,9 +40,16 @@ const defaultPlayer = {
   }
 };
 
+const updateEntities = () => {
+  clients.forEach((c) => {
+    c.emit('entities', entities);
+  });
+}
+
 io.on('connection', (client) => {
   const player = new Player(defaultPlayer);
   entities.push(player);
+  clients.push(client);
   console.log('xx connect'); // eslint-disable-line
   console.log('xx entities', entities); // eslint-disable-line
 
@@ -46,7 +57,7 @@ io.on('connection', (client) => {
 
   client.on('keyDown', (keys: any) => {
     player.update(keys);
-    client.emit('entities', entities);
+    updateEntities();
   });
 });
 
