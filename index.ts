@@ -23,6 +23,7 @@ export enum Keys {
   LEFT = 'left',
   DOWN = 'down',
   UP = 'up',
+  SPRINT = 'sprint',
 }
 
 const isPressed = {
@@ -30,6 +31,7 @@ const isPressed = {
   [Keys.LEFT]: false,
   [Keys.UP]: false,
   [Keys.DOWN]: false,
+  [Keys.SPRINT]: false,
 };
 
 const server = app.listen(PORT, HOST, () => {
@@ -67,8 +69,6 @@ function initWorld() {
       width:20,
     }
   };
-  
-  
   
   const updateEntities = () => {
     clients.forEach((c) => {
