@@ -8,10 +8,9 @@ import Database from './src/Database';
 const HOST = '0.0.0.0';
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
-const entities: Entity[] = [];
-const clients: any[] = [];
-
-const players: any = {};
+let entities: Entity[] = [];
+let clients: any[] = [];
+let players: any = {};
 
 const app = express();
 
@@ -42,7 +41,8 @@ const isPressed = {
 
 const server = app.listen(PORT, HOST, () => {
   console.log(`THE VOID is running @ ${HOST}:${PORT} `);
-
+  /* JASON LOG */ console.log('\nEntities => ', entities); // eslint-disable-line
+  /* JASON LOG */ console.log('Players => ', players); // eslint-disable-line
   initWorld();
 
   setInterval(() => {
@@ -84,14 +84,10 @@ function initWorld() {
   
   io.on('connection', (client) => {
     
-
-    console.log('xx connect'); // eslint-disable-line
-    console.log('xx entities', entities); // eslint-disable-line
-  
+    
     client.emit('entities', entities);
 
     client.on('join', (id: string) => {
-      /* JASON LOG */ console.log('xx JOINING'); // eslint-disable-line
       const savedPlayer = db.getPlayerById(id);
 
       const playerToAdd = {
@@ -113,7 +109,18 @@ function initWorld() {
 
       entities.push(player);
       clients.push(client);
+      /* JASON LOG */ console.log('\nEntities => ', entities); // eslint-disable-line
+      /* JASON LOG */ console.log('Players => ', players); // eslint-disable-line
 
+      client.on('disconnect', () => {
+        entities = entities.filter((p) => p !== player); 
+        clients = clients.filter((c) => c.id !== client.id);
+        delete players[client.id];
+        updateEntities();
+        /* JASON LOG */ console.log('\nEntities => ', entities); // eslint-disable-line
+        /* JASON LOG */ console.log('Players => ', players); // eslint-disable-line
+      })
+      
       client.on('keyDown', (keys: any) => {
         players[client.id].entity.update(keys);
         players[client.id].keys = keys;
@@ -124,6 +131,7 @@ function initWorld() {
         players[client.id].keys = keys;
         updateEntities();
       });
+   
     });
 
   });
