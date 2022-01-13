@@ -3,6 +3,7 @@ import express from 'express';
 import { Entity, Player } from './src/entity';
 import cors from 'cors';
 import { setInterval } from 'timers';
+import Database from './src/Database';
 
 const HOST = '0.0.0.0';
 const PORT = parseInt(process.env.PORT || '8080', 10);
@@ -14,9 +15,14 @@ const players: any = {};
 
 const app = express();
 
+const db = new Database();
+
 app.use(cors({
   origin: '*'
 }));
+
+app.use(express.json());
+
 
 export enum Keys {
   RIGHT = 'right',
@@ -106,10 +112,25 @@ function initWorld() {
     console.log('in here');
     res.send('connected');
   });
+
+
+  app.post('/register', async (req, res) => {
+    console.log(req.body);
+
+    const username = req.body.username;
+    const password = req.body.password;
+    const color = req.body.color;
+
+    try { 
+      if (username && password) {
+        const player = await db.authenticate(username, password, color);
+        res.send({ status: 'SUCCESS', player });
+      } else {
+        throw new Error('UNAUTHORIZED - Please provide a username and password');
+      }
+    } catch (e) {
+      res.status(401).send({ status: 'FAIL', error: e });
+    }
+  });
 }
-
-
-
-
-
 
