@@ -83,30 +83,53 @@ function initWorld() {
   }
   
   io.on('connection', (client) => {
-    const player = new Player(defaultPlayer);
-    players[client.id] = {};
-    players[client.id].entity = player;
-    players[client.id].keys = { isPressed };
-  
-    entities.push(player);
-    clients.push(client);
+    
+
     console.log('xx connect'); // eslint-disable-line
     console.log('xx entities', entities); // eslint-disable-line
   
     client.emit('entities', entities);
-    
+
+    client.on('join', (id: string) => {
+      /* JASON LOG */ console.log('xx JOINING'); // eslint-disable-line
+      const savedPlayer = db.getPlayerById(id);
+
+      const playerToAdd = {
+        name: savedPlayer.username,
+        color: savedPlayer.color,
+        size: {
+          height: 54,
+          width: 54,
+        },
+        position: savedPlayer.position,
+        speed: 1.5,
+      }
+
+      const player = new Player(playerToAdd);
+      
+      players[client.id] = {};
+      players[client.id].entity = player;
+      players[client.id].keys = { isPressed };
+
+      entities.push(player);
+      clients.push(client);
+
+      client.on('keyDown', (keys: any) => {
+        players[client.id].entity.update(keys);
+        players[client.id].keys = keys;
+        updateEntities();
+      });
   
-    client.on('keyDown', (keys: any) => {
-      player.update(keys);
-      players[client.id].keys = keys;
-      updateEntities();
+      client.on('keyUp', (keys: any) => {
+        players[client.id].keys = keys;
+        updateEntities();
+      });
     });
 
-    client.on('keyUp', (keys: any) => {
-      players[client.id].keys = keys;
-      updateEntities();
-    })
   });
+
+
+
   
   app.get('/', (req, res) => {
     console.log('in here');

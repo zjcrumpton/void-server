@@ -1,4 +1,6 @@
 export interface EntityState {
+  name: string,
+  color: string,
   size: {
     height: number,
     width: number,
@@ -21,6 +23,8 @@ export class Player implements Entity {
   public state: EntityState;
 
   constructor({ 
+    name = "Joe",
+    color = "blue",
     speed = 100,
     position: {
       x = 0,
@@ -32,6 +36,8 @@ export class Player implements Entity {
     }
   }: EntityState) {
     this.state = {
+      name,
+      color,
       speed,
       position: { x, y },
       size: { height, width }
