@@ -115,6 +115,10 @@ function initWorld() {
       client.on('disconnect', () => {
         entities = entities.filter((p) => p !== player); 
         clients = clients.filter((c) => c.id !== client.id);
+
+        const passwordDigest = db.getPlayerById(id).passwordDigest;
+        db.save({ id, position: player.state.position, color: player.state.color, passwordDigest, username: player.state.name });
+
         delete players[client.id];
         updateEntities();
         /* JASON LOG */ console.log('\nEntities => ', entities); // eslint-disable-line
