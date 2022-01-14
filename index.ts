@@ -47,11 +47,14 @@ const server = app.listen(PORT, HOST, () => {
 
   setInterval(() => {
     Object.keys(players).forEach((k) => {
-      const p = players[k];
-      p.entity.update(p.keys);
-      clients.forEach((c) => {
-        c.emit('entities', entities);
-      });
+      if (players[k]) {
+        const p = players[k];
+        p.entity.update(p.keys);
+        clients.forEach((c) => {
+          c.emit('entities', entities);
+        });
+      }
+
     });
   }, 1000 / 120);
 });
